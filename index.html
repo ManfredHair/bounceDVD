@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVD Screensaver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        #screensaver {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            cursor: none;
+        }
+
+        #logo {
+            position: absolute;
+            transition: none;
+            user-select: none;
+            pointer-events: none;
+            filter: hue-rotate(0deg) saturate(1.2) brightness(1.1);
+            border-radius: 8px;
+        }
+
+        #menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            min-width: 280px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        #menu.hidden {
+            transform: translateX(calc(100% + 40px));
+            opacity: 0;
+        }
+
+        #menuToggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        #menuToggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 12px;
+            color: #aaa;
+            min-width: 40px;
+        }
+
+        .title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #defaultLogo {
+            font-size: 120px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="screensaver">
+        <div id="logo">
+            <div id="defaultLogo">DVD</div>
+        </div>
+    </div>
+
+    <button id="menuToggle">⚙️</button>
+
+    <div id="menu">
+        <div class="title">🎮 DVD Controls</div>
+        
+        <div class="control-group">
+            <label for="imageInput">Custom Logo:</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <div class="control-group">
+            <label for="scaleSlider">Scale: <span class="range-value" id="scaleValue">1.0x</span></label>
+            <input type="range" id="scaleSlider" min="0.3" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label for="speedSlider">Speed: <span class="range-value" id="speedValue">2x</span></label>
+            <input type="range" id="speedSlider" min="0.5" max="8" step="0.5" value="2">
+        </div>
+
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="colorToggle" checked style="margin-right: 8px; transform: scale(1.2);">
+                Color Change on Bounce
+            </label>
+        </div>
+
+        <button class="reset-btn" id="resetBtn">Reset to Default</button>
+    </div>
+
+    <script>
+        class DVDScreensaver {
+            constructor() {
+                this.logo = document.getElementById('logo');
+                this.screensaver = document.getElementById('screensaver');
+                this.defaultLogo = document.getElementById('defaultLogo');
+                
+                // Position and movement
+                this.x = Math.random() * (window.innerWidth - 200);
+                this.y = Math.random() * (window.innerHeight - 100);
+                this.dx = 2;
+                this.dy = 2;
+                this.scale = 1;
+                this.speed = 2;
+                this.colorChangeEnabled = true;
+                
+                // Color cycling
+                this.hue = Math.random() * 360;
+                
+                this.setupEventListeners();
+                this.setupMenu();
+                this.animate();
+            }
+
+            setupEventListeners() {
+                window.addEventListener('resize', () => this.handleResize());
+                
+                // Image upload
+                document.getElementById('imageInput').addEventListener('change', (e) => {
+                    this.handleImageUpload(e);
+                });
+                
+                // Scale control
+                const scaleSlider = document.getElementById('scaleSlider');
+                scaleSlider.addEventListener('input', (e) => {
+                    this.scale = parseFloat(e.target.value);
+                    document.getElementById('scaleValue').textContent = this.scale.toFixed(1) + 'x';
+                    this.updateLogoTransform();
+                });
+                
+                // Speed control
+                const speedSlider = document.getElementById('speedSlider');
+                speedSlider.addEventListener('input', (e) => {
+                    this.speed = parseFloat(e.target.value);
+                    document.getElementById('speedValue').textContent = this.speed.toFixed(1) + 'x';
+                });
+                
+                // Color toggle
+                document.getElementById('colorToggle').addEventListener('change', (e) => {
+                    this.colorChangeEnabled = e.target.checked;
+                });
+                
+                // Reset button
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.reset();
+                });
+            }
+
+            setupMenu() {
+                const menuToggle = document.getElementById('menuToggle');
+                const menu = document.getElementById('menu');
+                let menuVisible = false;
+
+                menuToggle.addEventListener('click', () => {
+                    menuVisible = !menuVisible;
+                    menu.classList.toggle('hidden', !menuVisible);
+                    menuToggle.textContent = menuVisible ? '✕' : '⚙️';
+                });
+
+                // Hide menu initially
+                menu.classList.add('hidden');
+            }
+
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.defaultLogo.style.display = 'none';
+                    this.logo.style.backgroundImage = `url(${e.target.result})`;
+                    this.logo.style.backgroundSize = 'contain';
+                    this.logo.style.backgroundRepeat = 'no-repeat';
+                    this.logo.style.backgroundPosition = 'center';
+                    this.logo.style.width = '200px';
+                    this.logo.style.height = '100px';
+                    this.updateLogoTransform();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            updateLogoTransform() {
+                this.logo.style.transform = `scale(${this.scale})`;
+            }
+
+            reset() {
+                // Reset to default logo
+                this.defaultLogo.style.display = 'flex';
+                this.logo.style.backgroundImage = 'none';
+                this.logo.style.width = 'auto';
+                this.logo.style.height = 'auto';
+                
+                // Reset controls
+                document.getElementById('scaleSlider').value = 1;
+                document.getElementById('speedSlider').value = 2;
+                document.getElementById('scaleValue').textContent = '1.0x';
+                document.getElementById('speedValue').textContent = '2.0x';
+                document.getElementById('imageInput').value = '';
+                document.getElementById('colorToggle').checked = true;
+                
+                // Reset properties
+                this.scale = 1;
+                this.speed = 2;
+                this.colorChangeEnabled = true;
+                this.updateLogoTransform();
+                
+                // Reset position
+                this.x = Math.random() * (window.innerWidth - 200);
+                this.y = Math.random() * (window.innerHeight - 100);
+            }
+
+            handleResize() {
+                // Keep logo within bounds when window resizes
+                const rect = this.logo.getBoundingClientRect();
+                if (this.x + rect.width > window.innerWidth) {
+                    this.x = window.innerWidth - rect.width;
+                }
+                if (this.y + rect.height > window.innerHeight) {
+                    this.y = window.innerHeight - rect.height;
+                }
+            }
+
+            changeColor() {
+                this.hue = (this.hue + 30) % 360;
+                this.logo.style.filter = `hue-rotate(${this.hue}deg) saturate(1.2) brightness(1.1)`;
+            }
+
+            animate() {
+                // Get actual logo dimensions including scale
+                const logoRect = this.logo.getBoundingClientRect();
+                const logoWidth = logoRect.width;
+                const logoHeight = logoRect.height;
+                
+                // Update position
+                this.x += this.dx * this.speed;
+                this.y += this.dy * this.speed;
+                
+                // Check for collisions and bounce
+                let bounced = false;
+                
+                // Left and right wall collisions
+                if (this.x <= 0) {
+                    this.dx = Math.abs(this.dx); // Force positive direction
+                    this.x = 0;
+                    bounced = true;
+                } else if (this.x + logoWidth >= window.innerWidth) {
+                    this.dx = -Math.abs(this.dx); // Force negative direction
+                    this.x = window.innerWidth - logoWidth;
+                    bounced = true;
+                }
+                
+                // Top and bottom wall collisions
+                if (this.y <= 0) {
+                    this.dy = Math.abs(this.dy); // Force positive direction
+                    this.y = 0;
+                    bounced = true;
+                } else if (this.y + logoHeight >= window.innerHeight) {
+                    this.dy = -Math.abs(this.dy); // Force negative direction
+                    this.y = window.innerHeight - logoHeight;
+                    bounced = true;
+                }
+                
+                // Change color on bounce (if enabled)
+                if (bounced && this.colorChangeEnabled) {
+                    this.changeColor();
+                }
+                
+                // Apply position
+                this.logo.style.left = this.x + 'px';
+                this.logo.style.top = this.y + 'px';
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Start the screensaver
+        new DVDScreensaver();
+    </script>
+</body>
+</html>
